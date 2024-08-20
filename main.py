@@ -32,12 +32,22 @@ if __name__ == "__main__":
     for party in parties:
         totals[party] = []
     for item in items:
-        print(item)
         item["price"] *= item["quantity"]
-        for discount in discounts:
-            item["price"] *= 1 - (float(discount) / 100)
+        if len(discounts) != 1 and discounts[1] != "":
+            for discount in discounts:
+                item["price"] *= 1 - (float(discount) / 100)
         item["price"] *= 1 + (B_TAX if item["tax"] == "b" else T_TAX)
         item["price"] /= len(item["parties"])
         for party in item["parties"]:
             totals[party].append(item["price"])
-    print(totals)
+    grandTotal = 0.0
+    for party in totals:
+        print("=" * 24)
+        print(f"{party:^24}")
+        total = 0.0
+        for price in totals[party]:
+            total += price
+            print(f"${price}")
+        print(f"\n{f'Total: ${total:.2f}':>24}")
+        grandTotal += total
+    print(f"\n{f'Grand total: ${grandTotal:.2f}':>24}\n")
