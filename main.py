@@ -1,6 +1,8 @@
 B_TAX = 0.0225
 T_TAX = 0.0805
 
+TRUE_TYPES = ["true", "t", "yes", "y"]
+
 if __name__ == "__main__":
     print("Apartment Payments Calculator: v0.1")
     parties = input("Enter the people involved, seperated by comma:\n>>> ").replace(" ", "").lower().split(",")
@@ -51,3 +53,16 @@ if __name__ == "__main__":
         print(f"\n{f'Total: ${total:.2f}':>24}")
         grandTotal += total
     print(f"\n{f'Grand total: ${grandTotal:.2f}':>24}\n")
+    export = input("Would you like to export this transaction to a file?\n>>> ").lower()
+    if export in TRUE_TYPES:
+        #location = input("Choose location...\n>>> ") (location + "ap_receipt.txt") if location[-1] == "/" else (location + "/ap_receipt.txt")
+        with open("ap_receipt.txt", "a") as f:
+            for party in totals:
+                print("=" * 24, file=f)
+                print(f"{party:^24}", file=f)
+                total = 0.0
+                for price in totals[party]:
+                    total += price
+                    print(f"${price}", file=f)
+                print(f"\n{f'Total: ${total:.2f}':>24}", file=f)
+            print(f"\n{f'Grand total: ${grandTotal:.2f}':>24}\n", file=f)
