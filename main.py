@@ -40,7 +40,7 @@ if __name__ == "__main__":
         if len(discounts) != 1 and discounts[1] != "": # Assuming we have discounts to apply, we apply them in proceeding order to the item price
             for discount in discounts:
                 item["price"] *= 1 - (float(discount) / 100) # Converts percentage discount to valid decimal and applies it to the item price
-        item["price"] *= 1 + (B_TAX if item["tax"] == "b" else T_TAX) # Applied associated taxes based on the given tax type
+        item["price"] *= 1 + (B_TAX if item["tax"] == "b" else T_TAX) # Applies associated taxes based on the given tax type
         item["price"] /= len(item["parties"]) # Divides the cost amongst the associated parties
         for party in item["parties"]: # Applies the divides cost to each associated party's receipt
             totals[party].append(item["price"])
