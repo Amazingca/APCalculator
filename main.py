@@ -1,6 +1,9 @@
+from datetime import date
+
 # Tax categories by item – To my knowledge, food items are taxed lower since they are considered essentials.
 B_TAX = 0.0225
 T_TAX = 0.0805
+D_TAX = 0.029
 
 # All possibles responses that one can give to say "yes" to the receipt export prompt
 TRUE_TYPES = ["true", "t", "yes", "y"]
@@ -10,12 +13,12 @@ def printTotals(totals, totalDiscount, f):
     grandTotal = 0.0
     for party in totals:
         print("=" * 26, file=f)
-        party[1] = party[1].upper()
-        print(f"{party:^26}", file=f) # Center-align party name in-between 24 chars
+        print(f"{party[0].upper()+party[1:]:^26}", file=f) # Center-align party name in-between 24 chars
         total = 0.0
-        for price in totals[party]:
-            total += price
-            print(f"${price:.2f}", file=f)
+        for item in totals[party]:
+            total += item["totalPrice"]
+            preTotalText = f"""${item["price"]:.2f}{f" (x{item['quantity']})" if item["quantity"] > 1 else ""}""" # Line that contains basic information about the item - we need the length of it for proper right-side alignment which is why we are initializing it here
+            print(f"""{preTotalText}{f"${item['totalPrice']:.2f}":>{24 - len(preTotalText)}}{f" {item['tax'].upper() if item['tax'] != '' else ''}"}""", file=f)
         print(f"\n{f'Total: ${total:.2f}':>24}", file=f) # Right-align party total to 24 chars
         grandTotal += total
     if totalDiscount != None:
@@ -35,9 +38,10 @@ if __name__ == "__main__":
             continue
         else:
             itemPrice = float(itemPrice)
-            quantity = int(input("Enter item quantity:\n>>> "))
-            taxType = input("Enter a tax type (B|T):\n>>> ").lower()
-            while (taxType != "b" and taxType != "t"):
+            quantity = input("Enter item quantity:\n>>> ")
+            quantity = int(quantity) if quantity != "" else 1
+            taxType = input("Enter a tax type (B|T|D) or nothing for no tax:\n>>> ").lower()
+            while (taxType != "b" and taxType != "t" and taxType != "d" and taxType != ""):
                 taxType = input("This is not a valid tax type! Please try again...\n>>> ").lower()
             # extraDiscounts = input("Add extra discounts by percent:\n>>> ")
             involvedParties = input("Enter involved parties, seperated by comma:\n>>> ").replace(" ", "").lower().split(",")
@@ -50,7 +54,7 @@ if __name__ == "__main__":
             })
     discounts = input("Enter the percentage discounts applied to the order, sequentially, seperated by comma:\n>>> ").replace(" ", "").split(",")
     totalDiscount = None
-    if len(discounts) != 1 and discounts[1] != "": # Assuming we have discounts to apply, we apply them in proceeding order to the item price
+    if len(discounts) >= 1 and discounts[0] != "": # Assuming we have discounts to apply, we apply them in proceeding order to the item price
         totalDiscount = 1.0
         for discount in discounts:
             totalDiscount *= 1 - (float(discount) / 100) # Converts percentage discount to valid decimal and applies it to the total discount
@@ -58,17 +62,21 @@ if __name__ == "__main__":
     for party in parties:
         totals[party] = [] # Initializes an empty array for each party that is involved in the "totals" dictionary
     for item in items:
+        originalPrice = item["price"]
         item["price"] *= item["quantity"] # Sets price to that of the original cost times quantity
         if totalDiscount != None:
             item["price"] *= totalDiscount
-        item["price"] *= 1 + (B_TAX if item["tax"] == "b" else T_TAX) # Applies associated taxes based on the given tax type
+        item["price"] *= 1 + (B_TAX if item["tax"] == "b" else T_TAX if item["tax"] == "t" else D_TAX if item["tax"] == "d" else 0) # Applies associated taxes based on the given tax type
         item["price"] /= len(item["parties"]) # Divides the cost amongst the associated parties
         for party in item["parties"]: # Applies the divides cost to each associated party's receipt
-            totals[party].append(item["price"])
+            totals[party].append({
+                "price": originalPrice,
+                "totalPrice": item["price"],
+                "quantity": item["quantity"],
+                "tax": item["tax"]
+            })
     printTotals(totals, totalDiscount, None)
     export = input("Would you like to export this transaction to a file?\n>>> ").lower()
     if export in TRUE_TYPES:
-        #location = input("Choose location...\n>>> ") (location + "ap_receipt.txt") if location[-1] == "/" else (location + "/ap_receipt.txt")
-        # Essentially the same as above, though instead appends to a file instead of printing to console
-        with open("ap_receipt.txt", "a") as f:
+        with open(f"ap_{date.today()}.txt", "a") as f:
             printTotals(totals, totalDiscount, f);
