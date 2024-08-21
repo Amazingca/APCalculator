@@ -10,6 +10,7 @@ def printTotals(totals, totalDiscount, f):
     grandTotal = 0.0
     for party in totals:
         print("=" * 26, file=f)
+        party[1] = party[1].upper()
         print(f"{party:^26}", file=f) # Center-align party name in-between 24 chars
         total = 0.0
         for price in totals[party]:
