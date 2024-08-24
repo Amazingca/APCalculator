@@ -1,9 +1,12 @@
 from datetime import date
 
 # Tax categories by item – To my knowledge, food items are taxed lower since they are considered essentials.
-B_TAX = 0.0225
-T_TAX = 0.0805
-D_TAX = 0.029
+TAXES = {
+    "b": 0.0225,
+    "c": 0.0595,
+    "d": 0.029,
+    "t": 0.0805
+}
 
 # All possibles responses that one can give to say "yes" to the receipt export prompt
 TRUE_TYPES = ["true", "t", "yes", "y"]
@@ -40,8 +43,8 @@ if __name__ == "__main__":
             itemPrice = float(itemPrice)
             quantity = input("Enter item quantity:\n>>> ")
             quantity = int(quantity) if quantity != "" else 1
-            taxType = input("Enter a tax type (B|T|D) or nothing for no tax:\n>>> ").lower()
-            while (taxType != "b" and taxType != "t" and taxType != "d" and taxType != ""):
+            taxType = input("Enter a tax type (B|C|D|T) or nothing for no tax:\n>>> ").lower()
+            while ((taxType not in TAXES.keys()) and taxType != ""):
                 taxType = input("This is not a valid tax type! Please try again...\n>>> ").lower()
             # extraDiscounts = input("Add extra discounts by percent:\n>>> ")
             involvedParties = input("Enter involved parties, seperated by comma:\n>>> ").replace(" ", "").lower().split(",")
@@ -66,7 +69,7 @@ if __name__ == "__main__":
         item["price"] *= item["quantity"] # Sets price to that of the original cost times quantity
         if totalDiscount != None:
             item["price"] *= totalDiscount
-        item["price"] *= 1 + (B_TAX if item["tax"] == "b" else T_TAX if item["tax"] == "t" else D_TAX if item["tax"] == "d" else 0) # Applies associated taxes based on the given tax type
+        item["price"] *= 1 + (TAXES[item["tax"]] if item["tax"] in TAXES.keys() else 0) # Applies associated taxes based on the given tax type
         item["price"] /= len(item["parties"]) # Divides the cost amongst the associated parties
         for party in item["parties"]: # Applies the divides cost to each associated party's receipt
             totals[party].append({
