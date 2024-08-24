@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import datetime
 
 # Tax categories by item – To my knowledge, food items are taxed lower since they are considered essentials.
 TAXES = {
@@ -14,9 +15,13 @@ TRUE_TYPES = ["true", "t", "yes", "y"]
 # Prints the totals in receipt form to the console, and optionally to to specified file
 def printTotals(totals, totalDiscount, f):
     grandTotal = 0.0
+    if (f != None): # Gates this header to only print on the exported file
+        fullDate = datetime.now()
+        formattedDate = f"{fullDate.strftime('%A')}, {fullDate.month}/{fullDate.day}/{fullDate.year}" # Formats the date to go onto the receipt
+        print(f"{formattedDate:^26}", file=f)
     for party in totals:
         print("=" * 26, file=f)
-        print(f"{party[0].upper()+party[1:]:^26}", file=f) # Center-align party name in-between 24 chars
+        print(f"{party[0].upper()+party[1:]:^26}", file=f) # Center-align party name (capitalized) in-between 24 chars
         total = 0.0
         for item in totals[party]:
             total += item["totalPrice"]
