@@ -3,9 +3,11 @@ from datetime import datetime
 
 # Tax categories by item – To my knowledge, food items are taxed lower since they are considered essentials.
 TAXES = {
+    "a": 0.067,
     "b": 0.0225,
     "c": 0.0595,
     "d": 0.029,
+    "e": 0.0225,
     "t": 0.0805
 }
 
@@ -48,7 +50,7 @@ if __name__ == "__main__":
             itemPrice = float(itemPrice)
             quantity = input("Enter item quantity:\n>>> ")
             quantity = int(quantity) if quantity != "" else 1
-            taxType = input("Enter a tax type (B|C|D|T) or nothing for no tax:\n>>> ").lower()
+            taxType = input("Enter a tax type (A|B|C|D|E|T) or nothing for no tax:\n>>> ").lower()
             while ((taxType not in TAXES.keys()) and taxType != ""):
                 taxType = input("This is not a valid tax type! Please try again...\n>>> ").lower()
             # extraDiscounts = input("Add extra discounts by percent:\n>>> ")
