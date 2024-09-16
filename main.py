@@ -2,17 +2,21 @@ from datetime import date
 from datetime import datetime
 
 # Tax categories by item – To my knowledge, food items are taxed lower since they are considered essentials.
-TAXES = {
-    "a": 0.067,
-    "b": 0.0225,
-    "c": 0.0595,
-    "d": 0.029,
-    "e": 0.0225,
-    "t": 0.0805
-}
+# Use a CSV "./taxes.csv" in the following format to import:
+#
+# {name},{decimal of tax}
+# a,0.05
+# b,0.07
+TAXES = {}
 
 # All possibles responses that one can give to say "yes" to the receipt export prompt
 TRUE_TYPES = ["true", "t", "yes", "y"]
+
+def importTaxes():
+    with open("./taxes.csv") as file:
+        for line in file:
+            tax = line.split(",")
+            TAXES[tax[0]] = float(tax[1])
 
 # Prints the totals in receipt form to the console, and optionally to to specified file
 def printTotals(totals, totalDiscount, f):
@@ -37,6 +41,7 @@ def printTotals(totals, totalDiscount, f):
 
 if __name__ == "__main__":
     print("Apartment Payments Calculator: v1.0")
+    importTaxes()
     parties = input("Enter the people involved, seperated by comma:\n>>> ").replace(" ", "").lower().split(",")
     print(f"Total parties: {len(parties)}")
     continueAddingItems = True
@@ -50,7 +55,7 @@ if __name__ == "__main__":
             itemPrice = float(itemPrice)
             quantity = input("Enter item quantity:\n>>> ")
             quantity = int(quantity) if quantity != "" else 1
-            taxType = input("Enter a tax type (A|B|C|D|E|T) or nothing for no tax:\n>>> ").lower()
+            taxType = input(f"Enter a tax type ({'|'.join(TAXES)}) or nothing for no tax:\n>>> ").lower()
             while ((taxType not in TAXES.keys()) and taxType != ""):
                 taxType = input("This is not a valid tax type! Please try again...\n>>> ").lower()
             # extraDiscounts = input("Add extra discounts by percent:\n>>> ")
