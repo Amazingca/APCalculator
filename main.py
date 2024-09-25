@@ -5,8 +5,8 @@ from datetime import datetime
 # Use a CSV "./taxes.csv" in the following format to import:
 #
 # {name},{decimal of tax}
-# a,0.05
-# b,0.07
+#  a    , 0.05
+#  b    , 0.07
 TAXES = {}
 
 # All possibles responses that one can give to say "yes" to the receipt export prompt
