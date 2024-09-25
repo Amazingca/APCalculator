@@ -1,7 +1,7 @@
 from datetime import date
 from datetime import datetime
 
-# Tax categories by item – To my knowledge, food items are taxed lower since they are considered essentials.
+# Tax categories by item – Food items are typically taxed lower since they are considered essentials.
 # Use a CSV "./taxes.csv" in the following format to import:
 #
 # {name},{decimal of tax}
