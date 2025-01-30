@@ -19,7 +19,7 @@ def importTaxes():
             TAXES[tax[0]] = float(tax[1])
 
 # Prints the totals in receipt form to the console, and optionally to to specified file
-def printTotals(totals, totalDiscount, f):
+def printTotals(totals, taxList, totalDiscount, f):
     grandTotal = 0.0
     if (f != None): # Gates this header to only print on the exported file
         fullDate = datetime.now()
@@ -35,6 +35,10 @@ def printTotals(totals, totalDiscount, f):
             print(f"""{preTotalText}{f"${item['totalPrice']:.2f}":>{24 - len(preTotalText)}}{f" {item['tax'].upper() if item['tax'] != '' else ''}"}""", file=f)
         print(f"\n{f'Total: ${total:.2f}':>24}", file=f) # Right-align party total to 24 chars
         grandTotal += total
+    if len(taxList) > 0:
+        print()
+        for taxPart in taxList:
+            print(f"{f'{TAXES[taxPart]*100:.2f}% {taxPart.upper()}':>26}")
     if totalDiscount != None:
         print(f"\n{f'Total discount: {(1 - totalDiscount) * 100:.2f}%':>24} -", file=f) # Right-align total discount to 24 chars
     print(f"\n{f'Grand total: ${grandTotal:.2f}':>24}\n", file=f) # Right-align grand total to 24 chars
@@ -46,6 +50,7 @@ if __name__ == "__main__":
     print(f"Total parties: {len(parties)}")
     continueAddingItems = True
     items = []
+    taxList = []
     while (continueAddingItems):
         itemPrice = input("Enter a price for an item, or nothing to stop:\n>>> $")
         if (itemPrice == ""):
@@ -58,6 +63,8 @@ if __name__ == "__main__":
             taxType = input(f"Enter a tax type ({'|'.join(TAXES)}) or nothing for no tax:\n>>> ").lower()
             while ((taxType not in TAXES.keys()) and taxType != ""):
                 taxType = input("This is not a valid tax type! Please try again...\n>>> ").lower()
+            if taxType not in taxList:
+                taxList.append(taxType)
             # extraDiscounts = input("Add extra discounts by percent:\n>>> ")
             involvedParties = input("Enter involved parties, seperated by comma:\n>>> ").replace(" ", "").lower().split(",")
             print(f"Here's the details about the item:\nPrice: ${itemPrice} (x{quantity})\nParties: {involvedParties}")
@@ -90,8 +97,8 @@ if __name__ == "__main__":
                 "quantity": item["quantity"],
                 "tax": item["tax"]
             })
-    printTotals(totals, totalDiscount, None)
+    printTotals(totals, taxList, totalDiscount, None)
     export = input("Would you like to export this transaction to a file?\n>>> ").lower()
     if export in TRUE_TYPES:
         with open(f"ap_{date.today()}.txt", "a") as f:
-            printTotals(totals, totalDiscount, f);
+            printTotals(totals, taxList, totalDiscount, f);
