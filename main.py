@@ -38,7 +38,7 @@ def printTotals(totals, taxList, totalDiscount, f):
     if len(taxList) > 0:
         print()
         for taxPart in taxList:
-            print(f"{f'{TAXES[taxPart]*100:.2f}% {taxPart.upper()}':>26}")
+            print(f"{f'{TAXES[taxPart]*100:.2f}% {taxPart.upper()}':>26}", file=f)
     if totalDiscount != None:
         print(f"\n{f'Total discount: {(1 - totalDiscount) * 100:.2f}%':>24} -", file=f) # Right-align total discount to 24 chars
     print(f"\n{f'Grand total: ${grandTotal:.2f}':>24}\n", file=f) # Right-align grand total to 24 chars
