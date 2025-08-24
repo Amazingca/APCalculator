@@ -35,6 +35,7 @@ def printTotals(totals, taxList, totalDiscount, f):
             print(f"""{preTotalText}{f"${item['totalPrice']:.2f}":>{24 - len(preTotalText)}}{f" {item['tax'].upper() if item['tax'] != '' else ''}"}""", file=f)
         print(f"\n{f'Total: ${total:.2f}':>24}", file=f) # Right-align party total to 24 chars
         grandTotal += total
+    print("-" * 26)
     if len(taxList) > 0:
         print()
         for taxPart in taxList:
@@ -89,6 +90,7 @@ if __name__ == "__main__":
         if totalDiscount != None:
             item["price"] *= totalDiscount
         item["price"] *= 1 + (TAXES[item["tax"]] if item["tax"] in TAXES.keys() else 0) # Applies associated taxes based on the given tax type
+        item["price"] = ((item["price"]*100)//1)/100 # Sub out fractional cents
         item["price"] /= len(item["parties"]) # Divides the cost amongst the associated parties
         for party in item["parties"]: # Applies the divides cost to each associated party's receipt
             totals[party].append({
